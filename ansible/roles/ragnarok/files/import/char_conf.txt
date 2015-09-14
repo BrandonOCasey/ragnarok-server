@@ -7,6 +7,5 @@ wisp_server_name: mint
 login_ip: 127.0.0.1
 login_port: 7111
 
-
-char_ip: [wan_ip_here]
+char_ip: 10.0.2.15
 

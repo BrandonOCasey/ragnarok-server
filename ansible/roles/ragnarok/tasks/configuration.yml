@@ -1,0 +1,56 @@
+- name: Clear import settings folder
+  sudo: yes
+  file: path=/srv/ragnarok/conf/import state=absent
+
+- name: Copy ansible setting to server import
+  sudo: yes
+  copy: src=../files/import dest=/srv/ragnarok/conf force=yes
+
+- name: Copy ansible setting to server npc
+  sudo: yes
+  copy: src=../files/npc/motd.txt dest=/srv/ragnarok/npc force=yes
+
+- name: Get Wan IP
+  shell: wget -qO- http://ipecho.net/plain ; echo
+  register: host_ip
+
+- name: replace char_ip in char
+  lineinfile:
+    name: /srv/ragnarok/conf/import/char_conf.txt
+    regexp: '^char_ip: '
+    line: 'char_ip: {{host_ip.stdout}}'
+
+- name: replace map_ip map
+  lineinfile:
+    name: /srv/ragnarok/conf/import/map_conf.txt
+    regexp: '^map_ip: '
+    line: 'map_ip: {{host_ip.stdout}}'
+
+- name: replace userid in char
+  lineinfile:
+    name: /srv/ragnarok/conf/import/char_conf.txt
+    regexp: '^userid: '
+    line: 'userid: {{login_user}}'
+
+- name: replace userid in map
+  lineinfile:
+    name: /srv/ragnarok/conf/import/map_conf.txt
+    regexp: '^userid: '
+    line: 'userid: {{login_user}}'
+
+- name: replace passwd in char
+  lineinfile:
+    name: /srv/ragnarok/conf/import/char_conf.txt
+    regexp: '^passwd: '
+    line: 'passwd: {{login_pass}}'
+
+- name: replace passwd in map
+  lineinfile:
+    name: /srv/ragnarok/conf/import/map_conf.txt
+    regexp: '^passwd: '
+    line: 'passwd: {{login_pass}}'
+
+
+
+- name: Setup login credentials in mysql
+  shell: echo "UPDATE ragnarok.login SET userid = '{{login_user}}', user_pass = '{{login_pass}}' where account_id = 1;" | mysql -u"{{mysql_root_user}}" -p"{{mysql_root_pass}}" ragnarok

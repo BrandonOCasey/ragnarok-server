@@ -26,5 +26,5 @@ log_db_id: ragnarok
 log_db_pw: ragnarok
 log_db_db: ragnarok_logs
 log_codepage:
-log_login_db: ragnarok_logs
+log_login_db: loginlog
 

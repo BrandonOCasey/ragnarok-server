@@ -1,14 +1,24 @@
 - name: Seed ragnarok logs Database
-  shell: cat /srv/ragnarok/sql-files/logs.sql | mysql -uragnarok -p ragnarok_logs
   sudo: yes
+  mysql_db:
+    name: ragnarok_logs
+    state: import
+    target: /srv/ragnarok/sql-files/logs.sql
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
 
 - name: Seed ragnarok main Database
-  shell: cat /srv/ragnarok/sql-files/{{item}}.sql | mysql -uragnarok -p ragnarok
   sudo: yes
+  mysql_db:
+    name: ragnarok
+    state: import
+    target: /srv/ragnarok/sql-files/{{item}}.sql
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
   with_items:
     - main
     - item_db
-    - mod_db
+    - mob_db
     - mob_skill_db
     - item_db_re
     - mob_db_re
@@ -16,12 +26,3 @@
     - item_db2
     - mob_db2
     - mob_skill_db2
-
-- name: Seed ragnarok logs Database
-  shell: cat /srv/ragnarok/sql-files/logs.sql | mysql -uragnarok -p ragnarok_logs
-
-- name: Setup login server
-  shell: echo "UPDATE ragnarok.login SET userid = 'ragnarok', user_pass = 'ragnarok' where account_id = 1;" | mysql -uragnarok -p ragnarok
-
-#- name: Copy ansible setting to server import
-#copy: src=../files/* dest=/srv/ragnarok/conf/import/ force=yes

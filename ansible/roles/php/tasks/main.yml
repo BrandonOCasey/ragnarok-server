@@ -10,6 +10,7 @@
   command: test -f /usr/local/bin/composer
   sudo: yes
   ignore_errors: yes
+  changed_when: False
   register: composer_check
 
 - name: Install Composer

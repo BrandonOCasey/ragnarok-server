@@ -1,0 +1,24 @@
+groups: (
+{
+	id: 0
+	name: "Player"
+	level: 0
+	commands: {
+		help: true
+		mobinfo: true
+		whodrops: true
+		iteminfo: true
+		time: true
+		hominfo: true
+		showexp: true
+		showzeny: true
+		autoloot: true
+		autotrade: true
+	}
+	permissions: {
+        trade or party */
+        can_trade: true
+        can_party: true
+    }
+},
+)

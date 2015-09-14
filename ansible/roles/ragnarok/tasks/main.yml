@@ -31,10 +31,11 @@
 - name: Clone Ragnarok Server
   git: repo=https://github.com/HerculesWS/Hercules.git dest=/srv/ragnarok/
   sudo: yes
-
+  when: first_install_check.rc != 0
 
 - name: Check if update is available
   shell: 'cd /srv/ragnarok && git fetch && test "$(git rev-parse HEAD)" = "$(git rev-parse @{u})"'
+  ignore_errors: yes
   register: update_check
   sudo: yes
   changed_when: False
@@ -42,9 +43,7 @@
 - name: Update Ragnarok Server
   git: force=yes repo=https://github.com/HerculesWS/Hercules.git dest=/srv/ragnarok/ update=yes
   sudo: yes
-  when: update_check.rc == 0
-
-
+  when: update_check.rc != 0
 
 #
 # MySQL
@@ -54,39 +53,52 @@
   sudo: yes
 
 - name: Add a mysql database for ragnarok
-  mysql_db: db=ragnarok state=present login_user=root login_password=root
+  mysql_db:
+    db: ragnarok
+    state: present
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
 
-- name: Add a mysql database for ragnarok
-  mysql_db: db=ragnarok_logs state=present login_user=root login_password=root
+- name: Add a mysql database for ragnarok logs
+  mysql_db:
+    db: ragnarok_logs
+    state: present
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
 
 - name: Add a mysql user for ragnarok
-  mysql_user: user=ragnarok password=ragnarok host=localhost priv={{item}} state=present login_user=root login_password=root
-  with_items:
-    - ragnarok.*:ALL
-    - ragnarok_logs.*:ALL
-
+  mysql_user:
+    user: "{{mysql_user}}"
+    password: "{{mysql_pass}}"
+    host: localhost
+    state: present
+    login_user: "{{mysql_root_user}}"
+    login_password: "{{mysql_root_pass}}"
+    priv: ragnarok_logs.*:ALL/ragnarok.*:ALL
 
 #
 # update & first install
 #
 
 - name: Plugin check
-  file: src=/srv/ragnarok/plugins/empty.txt state=absent
+  file: path=/srv/ragnarok/plugins/empty.txt state=absent
+  sudo: yes
 
 - name: check for plugins
-  shell: test -n "$(find test -type f)"
+  shell: test -n "$(find /srv/ragnarok/plugins -type f)"
   changed_when: False
+  ignore_errors: yes
   register: plugins_exist
 
-- name: install ragnarok
+- name: install ragnarok (no plugins)
   shell: cd /srv/ragnarok && ./configure && make clean && make sql
   sudo: yes
-  when: (first_install_check.rc != 0 or update_check.rc == 0) and plugins_exist.rc != 0
+  when: (first_install_check.rc != 0 or update_check.rc != 0) and plugins_exist.rc != 0
 
-- name: install ragnarok with plugins
+- name: install ragnarok (with plugins)
   shell: cd /srv/ragnarok && ./configure && make clean && make sql plugins
   sudo: yes
-  when: (first_install_check.rc != 0 or update_check.rc == 0) and plugins_exist.rc == 0
+  when: (first_install_check.rc != 0 or update_check.rc != 0) and plugins_exist.rc == 0
 
 #
 # first install only
@@ -96,15 +108,15 @@
   when: first_install_check.rc != 0
 
 #
-# Permissions
+# Permissions/Credentials
 #
+
+- include: configuration.yml
 
 - name: add system ragnarok user
   user: name=ragnarok shell=/usr/sbin/nologin state=present
   sudo: yes
 
-
 - name: set permissions on Ragnarok Server folder
   file: recurse=yes owner=ragnarok group=ragnarok path=/srv/ragnarok
   sudo: yes
-

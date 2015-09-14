@@ -3,4 +3,5 @@ passwd: ragnarok
 
 char_ip: 127.0.0.1
 
-map_ip: [wan_ip]
+//map_ip: [wan_ip]
+map_ip: 10.0.2.15
