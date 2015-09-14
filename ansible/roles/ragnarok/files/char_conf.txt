@@ -1,0 +1,12 @@
+userid: ragnarok
+passwd: ragnarok
+
+server_name: mint
+wisp_server_name: mint
+
+login_ip: 127.0.0.1
+login_port: 7111
+
+
+char_ip: [wan_ip_here]
+
