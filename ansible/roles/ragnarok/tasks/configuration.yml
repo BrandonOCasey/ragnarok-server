@@ -15,42 +15,46 @@
   register: host_ip
 
 - name: replace char_ip in char
+  sudo: yes
   lineinfile:
     name: /srv/ragnarok/conf/import/char_conf.txt
     regexp: '^char_ip: '
     line: 'char_ip: {{host_ip.stdout}}'
 
 - name: replace map_ip map
+  sudo: yes
   lineinfile:
     name: /srv/ragnarok/conf/import/map_conf.txt
     regexp: '^map_ip: '
     line: 'map_ip: {{host_ip.stdout}}'
 
 - name: replace userid in char
+  sudo: yes
   lineinfile:
     name: /srv/ragnarok/conf/import/char_conf.txt
     regexp: '^userid: '
     line: 'userid: {{login_user}}'
 
 - name: replace userid in map
+  sudo: yes
   lineinfile:
     name: /srv/ragnarok/conf/import/map_conf.txt
     regexp: '^userid: '
     line: 'userid: {{login_user}}'
 
 - name: replace passwd in char
+  sudo: yes
   lineinfile:
     name: /srv/ragnarok/conf/import/char_conf.txt
     regexp: '^passwd: '
     line: 'passwd: {{login_pass}}'
 
 - name: replace passwd in map
+  sudo: yes
   lineinfile:
     name: /srv/ragnarok/conf/import/map_conf.txt
     regexp: '^passwd: '
     line: 'passwd: {{login_pass}}'
-
-
 
 - name: Setup login credentials in mysql
   shell: echo "UPDATE ragnarok.login SET userid = '{{login_user}}', user_pass = '{{login_pass}}' where account_id = 1;" | mysql -u"{{mysql_root_user}}" -p"{{mysql_root_pass}}" ragnarok
