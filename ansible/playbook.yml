@@ -3,10 +3,10 @@
     - common
     - dotfiles
     - php
-      #  - mysql
-      # - nodejs
+    - mysql
+    - nodejs
     - ragnarok
-  #vars_prompt:
+  # vars_prompt:
     #- name: "mysql_root_password"
     #   prompt: "Enter Mysql Root Password"
     # private: yes
