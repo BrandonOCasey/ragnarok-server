@@ -1,0 +1,14 @@
+- hosts: all
+  roles:
+    - common
+    - dotfiles
+    - php
+      # - mysql
+      #- nodejs
+    - rathena
+  #vars_prompt:
+    #- name: "mysql_root_password"
+    #   prompt: "Enter Mysql Root Password"
+    # private: yes
+    # confirm: yes
+

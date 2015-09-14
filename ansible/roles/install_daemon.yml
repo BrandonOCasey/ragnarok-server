@@ -1,0 +1,7 @@
+- name: Install {{daemon_name}}
+  apt: name={{daemon_package}} state=latest
+  sudo: yes
+
+- name: Start {{daemon_name}} and Start on Boot
+  service: name={{daemon_service}} state=started enabled=yes
+  sudo: yes

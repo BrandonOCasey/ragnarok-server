@@ -1,0 +1,23 @@
+- name: Add php 5.6 repo
+  apt_repository: repo='ppa:ondrej/php5-5.6'
+  sudo: yes
+
+- name: Install PHP
+  apt: name=php5 state=present
+  sudo: yes
+
+- name: Check composer
+  command: test -f /usr/local/bin/composer
+  sudo: yes
+  ignore_errors: yes
+  register: composer_check
+
+- name: Install Composer
+  shell: curl -sS https://getcomposer.org/installer | php5
+  sudo: yes
+  when: composer_check.rc != 0
+
+- name: Move Composer to Global Dir
+  shell: mv composer.phar /usr/local/bin/composer
+  sudo: yes
+  when: composer_check.rc != 0

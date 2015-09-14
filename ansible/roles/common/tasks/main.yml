@@ -1,0 +1,34 @@
+- name: Update Cache
+  apt: update_cache=yes cache_valid_time=3600
+  sudo: yes
+
+- name: Build Tools, and general dependancies
+  action: apt name={{item}} state=latest
+  sudo: yes
+  with_items:
+    - wget
+    - vim
+    - build-essential
+    - git
+    - ack-grep
+    - tmux
+    - python-software-properties
+
+- name: Is /usr/local/bin in sudo path already?
+  shell: cat /etc/sudoers | grep secure_path | grep '/usr/local/bin'
+  sudo: yes
+  register: local_bin_check
+  ignore_errors: yes
+  changed_when: False
+
+- name: Add /usr/local/bin to sudo path
+  shell: cat /etc/sudoers | sed 's~\(.*secure_path = .*\)~\1:/usr/local/bin~' | tee /tmp/sudoers
+  sudo: yes
+  register: sudoers_edit
+  failed_when: sudoers_edit.stdout == ""
+  when: local_bin_check.stdout == "" and local_bin_check.stderr == ""
+
+- name: Overwrite current sudoers if that command had output
+  sudo: yes
+  shell: sudo mv /tmp/sudoers /etc/sudoers
+  when: local_bin_check.stdout == "" and local_bin_check.stderr == ""
